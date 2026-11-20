@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CHECKLIST - TÉCNICA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --red:#E4002B; --red-d:#B0001F; --black:#0A0A0A; --ink:#141414; --ink2:#1E1E1E; --line:#2C2C2C;
+    --white:#FFFFFF; --muted:#A3A3A3;
+    --head:"Oswald","Arial Narrow",Impact,sans-serif; --body:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  }
+  *{box-sizing:border-box}
+  [hidden]{display:none!important}
+  .sync:empty{display:none}
+  body{margin:0;font-family:var(--body);background:var(--black);color:var(--white)}
+
+  /* ---------- Header con banda diagonal ---------- */
+  header{position:sticky;top:0;z-index:10;background:var(--black);border-bottom:3px solid var(--red);overflow:hidden}
+  header::before{content:"";position:absolute;top:-40px;right:120px;width:90px;height:260px;background:var(--red);transform:rotate(35deg);opacity:.9;pointer-events:none}
+  .top{position:relative;display:flex;align-items:center;gap:8px;flex-wrap:wrap;max-width:1040px;margin:0 auto;padding:14px 16px 6px}
+  .brand{font-family:var(--head);font-weight:700;font-size:26px;letter-spacing:1.5px;line-height:1;text-transform:uppercase}
+  .brand b{color:var(--red);font-weight:700}
+  .sub{color:var(--muted);font-size:12px;letter-spacing:.5px;margin-top:4px;text-transform:uppercase}
+  .spacer{flex:1}
+  .sync{font-size:12px;color:var(--muted);background:var(--black);padding:2px 6px;border-radius:4px}
+  .sync.err{color:#ff6b7f} .sync.ok{color:var(--white)}
+
+  button,.btn{font:inherit;font-size:13px;cursor:pointer;border:1px solid var(--line);background:var(--ink2);color:var(--white);padding:8px 13px;border-radius:6px;text-decoration:none;display:inline-flex;align-items:center;gap:6px}
+  button:hover,.btn:hover{border-color:var(--white)}
+  button:disabled{opacity:.5;cursor:wait}
+  .primary{background:var(--red);border-color:var(--red);font-weight:600}
+  .primary:hover{background:var(--red-d);border-color:var(--red-d)}
+  .ghost{background:transparent}
+  .danger{border-color:var(--red);color:var(--white)}
+  .danger:hover{background:var(--red)}
+
+  .tabs{position:relative;display:flex;gap:6px;overflow-x:auto;padding:8px 16px 12px;max-width:1040px;margin:0 auto}
+  .tab{white-space:nowrap;border-radius:4px;padding:7px 14px;background:var(--ink);font-family:var(--head);font-size:15px;letter-spacing:.8px;text-transform:uppercase}
+  .tab.active{background:var(--white);color:var(--black);border-color:var(--white)}
+  .tab small{font-family:var(--body);font-size:11px;opacity:.65;margin-left:6px;letter-spacing:0}
+
+  main{max-width:1040px;margin:0 auto;padding:18px 16px 60px}
+  .banner{max-width:1040px;margin:14px auto 0;padding:10px 14px;border-left:4px solid var(--red);background:var(--ink);font-size:13px;color:#ddd}
+
+  /* ---------- Cabecera del show ---------- */
+  .showhead{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+  .showhead h1{margin:0;font-family:var(--head);font-weight:700;font-size:34px;letter-spacing:1.5px;text-transform:uppercase;line-height:1}
+  .pct{font-family:var(--head);font-size:34px;color:var(--red);line-height:1}
+  .count{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+  .bar{height:10px;background:var(--ink2);overflow:hidden;margin:8px 0 6px;border-radius:2px}
+  .bar>div{height:100%;background:var(--red);transition:width .25s}
+  .bar.done>div{background:var(--white)}
+  .tools{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:12px 0 18px}
+  .tools input{flex:1;min-width:180px;padding:9px 12px;border-radius:6px;border:1px solid var(--line);background:var(--ink);color:var(--white);font:inherit;font-size:14px}
+  .tools label{font-size:13px;color:var(--muted);display:flex;gap:6px;align-items:center;cursor:pointer}
+  .tools label input{flex:none;min-width:0;width:auto}
+
+  /* ---------- Tarjetas ---------- */
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
+  .group{background:var(--ink);border:1px solid var(--line);border-top:4px solid var(--white);border-radius:6px;overflow:hidden}
+  .group.complete{border-top-color:var(--red)}
+  .ghead{display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid var(--line)}
+  .ghead h2{margin:0;font-family:var(--head);font-weight:500;font-size:17px;letter-spacing:1px;text-transform:uppercase;flex:1}
+  .group.complete .ghead h2::after{content:" ✓";color:var(--red)}
+  .group.complete .count{color:var(--white);font-weight:600}
+  .ghead button{padding:3px 9px;font-size:11px}
+  ul{list-style:none;margin:0;padding:4px 0}
+  li label{display:flex;align-items:flex-start;gap:11px;padding:9px 14px;cursor:pointer;user-select:none}
+  li label:hover{background:#ffffff0a}
+  input[type=checkbox]{appearance:none;flex:none;width:22px;height:22px;border:2px solid #6b6b6b;border-radius:4px;margin:0;display:grid;place-content:center;cursor:pointer;background:var(--black)}
+  input[type=checkbox]:checked{background:var(--red);border-color:var(--red)}
+  input[type=checkbox]:checked::after{content:"";width:6px;height:11px;border:solid var(--white);border-width:0 3px 3px 0;transform:rotate(45deg) translate(-1px,-1px)}
+  .item{flex:1;min-width:0}
+  .item .name{font-size:15px}
+  .item .qty{display:inline-block;background:var(--white);color:var(--black);font-weight:700;font-size:12px;padding:0 6px;border-radius:3px;margin-right:6px;vertical-align:1px}
+  .item .note{display:block;font-size:12px;color:var(--muted);margin-top:2px}
+  .item .who{display:block;font-size:12px;color:var(--red);font-weight:600;margin-top:2px}
+  li.checked .name{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--red)}
+  li.pending{opacity:.55}
+  li.hide{display:none}
+  .empty{color:var(--muted);text-align:center;padding:50px 0}
+
+  /* ---------- Diálogos ---------- */
+  dialog{background:var(--ink);color:var(--white);border:1px solid var(--line);border-top:4px solid var(--red);border-radius:6px;max-width:720px;width:95%;padding:20px}
+  dialog::backdrop{background:#000c}
+  dialog h3{margin:0 0 6px;font-family:var(--head);font-size:22px;letter-spacing:1px;text-transform:uppercase}
+  dialog label.f{display:block;font-size:12px;color:var(--muted);margin:12px 0 4px;text-transform:uppercase;letter-spacing:.5px}
+  dialog input,dialog select{width:100%;padding:8px 10px;border-radius:5px;border:1px solid var(--line);background:var(--black);color:var(--white);font:inherit;font-size:14px}
+  dialog input:disabled{opacity:.6}
+  dialog p{font-size:14px;color:#ddd;line-height:1.5}
+  .actions{display:flex;gap:8px;justify-content:flex-end;margin-top:16px;flex-wrap:wrap}
+  .nswrap{max-height:48vh;overflow:auto;margin-top:12px;border:1px solid var(--line);border-radius:5px}
+  .nstable{width:100%;border-collapse:collapse;font-size:13px}
+  .nstable th{position:sticky;top:0;background:var(--black);text-align:left;color:var(--muted);font-weight:500;padding:6px;font-size:11px;text-transform:uppercase}
+  .nstable td{padding:3px}
+  .nstable td:nth-child(3){width:62px}
+  .nstable td:last-child{width:36px}
+  .nstable button{padding:6px 9px}
+
+  .toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%) translateY(120px);background:var(--white);color:var(--black);padding:10px 16px;border-radius:6px;font-size:14px;font-weight:500;box-shadow:0 6px 24px #0009;transition:transform .25s;z-index:50;max-width:90vw}
+  .toast.show{transform:translateX(-50%) translateY(0)}
+  .toast.err{background:var(--red);color:var(--white)}
+
+  @media (max-width:600px){ header::before{right:-10px} .showhead h1,.pct{font-size:26px} }
+  @media print{
+    header,.tools,.ghead button,.banner,.toast{display:none!important}
+    body{background:#fff;color:#000} .group{background:#fff;border-color:#999;break-inside:avoid} .item .note{color:#555}
+    input[type=checkbox]{border-color:#000;background:#fff}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="top">
+    <div>
+      <div class="brand">Checklist <b>–</b> Técnica</div>
+      <div class="sub">Chas Park Music · backline por show</div>
+    </div>
+    <div class="spacer"></div>
+    <span class="sync" id="sync"></span>
+    <button class="primary" id="btnNew">＋ Nuevo show</button>
+    <button id="btnReload" title="Actualizar desde el Sheet">↻</button>
+    <a class="btn" id="btnSheet" hidden target="_blank" rel="noopener" title="Abrir el Google Sheet">Sheet</a>
+    <button id="btnConfig" title="Configuración">⚙</button>
+  </div>
+  <nav class="tabs" id="tabs"></nav>
+</header>
+
+<div class="banner" id="demoBanner" hidden><b>Modo ejemplo:</b> los cambios quedan solo en este navegador. Tocá ⚙ y pegá la URL de la app de Google para guardar en el Sheet.</div>
+<main id="main"></main>
+<div class="toast" id="toast"></div>
+
+<!-- Confirmación -->
+<dialog id="confirm">
+  <h3 id="cfTitle"></h3>
+  <p id="cfText"></p>
+  <div class="actions">
+    <button class="ghost" id="cfNo">Cancelar</button>
+    <button class="primary" id="cfYes">Confirmar</button>
+  </div>
+</dialog>
+
+<!-- Configuración -->
+<dialog id="cfg">
+  <h3>Configuración</h3>
+  <label class="f">Tu nombre (queda registrado en cada tilde)</label>
+  <input id="cfgUser" placeholder="Ej: Laura">
+  <label class="f">URL de la app (Apps Script → Implementar → URL de la aplicación web)</label>
+  <input id="cfgUrl" placeholder="https://script.google.com/macros/s/.../exec">
+  <label class="f">PIN del equipo (si lo configuraron en el script)</label>
+  <input id="cfgPin" type="password" placeholder="Opcional">
+  <div class="actions">
+    <button class="ghost" id="cfgCancel">Cancelar</button>
+    <button class="primary" id="cfgSave">Guardar</button>
+  </div>
+</dialog>
+
+<!-- Nuevo / editar show -->
+<dialog id="ns">
+  <h3 id="nsTitle">Nuevo show</h3>
+  <label class="f">Nombre del show</label>
+  <input id="nsName" placeholder="Ej: Bodas de Coral – Montevideo">
+  <div id="nsCopyWrap">
+    <label class="f">Partir del backline de otro show (opcional)</label>
+    <select id="nsCopy"></select>
+  </div>
+  <div class="nswrap">
+    <table class="nstable">
+      <thead><tr><th>Sección</th><th>Ítem</th><th>Cant.</th><th>Notas</th><th></th></tr></thead>
+      <tbody id="nsRows"></tbody>
+    </table>
+  </div>
+  <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
+    <button id="nsAdd">＋ Agregar ítem</button>
+    <button id="nsAddSec" class="ghost">＋ Sección completa del catálogo</button>
+  </div>
+  <datalist id="secList"></datalist>
+  <datalist id="itemList"></datalist>
+  <div class="actions">
+    <button class="ghost" id="nsCancel">Cancelar</button>
+    <button class="primary" id="nsSave">Guardar show</button>
+  </div>
+</dialog>
+
+<script>
+/* ================= CONFIG =================
+   Pegá acá la URL de la app de Apps Script para que nadie tenga que configurarla. */
+const SCRIPT_URL_DEFAULT = "";
+
+/* Datos de ejemplo: inventario Bodas de Coral (PDF Uruguay 2026) */
+const DEMO_ROWS = [["Show", "Sección", "Ítem", "Cantidad", "Notas"], ["Bodas de Coral", "Teclados y pianos", "Teclado Yamaha CP88", "1", "Bulto 1 · baúl"], ["Bodas de Coral", "Teclados y pianos", "Teclado Yamaha Montage 8", "1", "Bulto 2 · baúl"], ["Bodas de Coral", "Teclados y pianos", "Banqueta de piano", "1", "Bulto 24"], ["Bodas de Coral", "Estructuras símil piano", "Estructura símil piano desmontable", "1", "Bulto 19 · bolso rojo"], ["Bodas de Coral", "Estructuras símil piano", "Estructura símil piano desmontable", "1", "Bulto 20 · baúl"], ["Bodas de Coral", "Estructuras símil piano", "Estructura símil piano desmontable", "1", "Bulto 21 · baúl"], ["Bodas de Coral", "Estructuras símil piano", "Estructura símil piano desmontable", "1", "Bulto 22 · baúl"], ["Bodas de Coral", "Consola de sonido", "Consola Yamaha DM7C", "1", "Bulto 3 · baúl"], ["Bodas de Coral", "Baúl pachera digital", "Stage box Yamaha Rio 3224-D", "1", "Bulto 4"], ["Bodas de Coral", "Baúl pachera digital", "Switch Cisco SG200-08", "2", "Bulto 4"], ["Bodas de Coral", "Pedaleras", "Pedalera Roland PK-5", "1", "Bulto 5 · baúl"], ["Bodas de Coral", "Pedaleras", "Pedalera POD Line 6", "1", "Bulto 6 · valija"], ["Bodas de Coral", "Pedaleras", "Pedal Boss Line Selector LS-2", "1", "Bulto 6 · valija"], ["Bodas de Coral", "Pedaleras", "Cables plug-plug + interpedal", "1", "Bulto 6 · 3 plug-plug, 1 interpedal"], ["Bodas de Coral", "Rack interfaces", "MOTU MIDI Timepiece", "1", "Bulto 7"], ["Bodas de Coral", "Rack interfaces", "MOTU MIDI Micro Lite", "1", "Bulto 7"], ["Bodas de Coral", "Rack interfaces", "MOTU MIDI Express", "1", "Bulto 7"], ["Bodas de Coral", "Bolso redondo", "Banqueta regulable y cables de conexión", "1", "Bulto 8"], ["Bodas de Coral", "Baúl soportes de batería", "Stand hi-hat HS7-40A", "1", "Bulto 9"], ["Bodas de Coral", "Baúl soportes de batería", "Pedal de bombo Yamaha Iron Cobra", "1", "Bulto 9"], ["Bodas de Coral", "Baúl soportes de batería", "Banqueta de batería Yamaha", "1", "Bulto 9"], ["Bodas de Coral", "Baúl soportes de batería", "Snare stand Yamaha SS662", "1", "Bulto 9"], ["Bodas de Coral", "Baúl soportes de batería", "Stand platos Yamaha CH755", "4", "Bulto 9"], ["Bodas de Coral", "Baúl soportes de batería", "Pie octapad Yamaha", "1", "Bulto 9"], ["Bodas de Coral", "Baúl soportes de batería", "Pie bombo legüero", "1", "Bulto 9"], ["Bodas de Coral", "Baúl batería", "Armazón Hexrack2 RS10-HXR (3 partes)", "1", "Bulto 10"], ["Bodas de Coral", "Baúl batería", "Módulo Yamaha DTX-PROX", "1", "Bulto 10"], ["Bodas de Coral", "Baúl batería", "Tom 1 Yamaha XP105T-M", "1", "Bulto 10"], ["Bodas de Coral", "Baúl batería", "Tom 2 Yamaha XP105T-M", "1", "Bulto 10"], ["Bodas de Coral", "Baúl batería", "Tom 3 Yamaha XP125T-M", "1", "Bulto 10"], ["Bodas de Coral", "Baúl batería", "Snare Yamaha XP125D-M", "1", "Bulto 10"], ["Bodas de Coral", "Baúl batería", "Bombo Yamaha KP128", "1", "Bulto 10"], ["Bodas de Coral", "Baúl batería", "Ride Yamaha PCY175", "1", "Bulto 10"], ["Bodas de Coral", "Baúl batería", "Crash 1 Yamaha PCY135", "1", "Bulto 10"], ["Bodas de Coral", "Baúl batería", "Crash 2 Yamaha PCY155", "1", "Bulto 10"], ["Bodas de Coral", "Baúl batería", "Hi-hat Yamaha RHH135", "1", "Bulto 10"], ["Bodas de Coral", "Baúl batería", "Octapad Yamaha DTX-Multi 12", "1", "Bulto 10"], ["Bodas de Coral", "Baúl batería", "Pad Roland PD9", "1", "Bulto 10"], ["Bodas de Coral", "Baúl batería", "Cables de conexión", "1", "Bulto 10"], ["Bodas de Coral", "Baúl batería", "Caja directa múltiple", "1", "Bulto 10"], ["Bodas de Coral", "Baúl batería", "Pedal POG Electro-Harmonix", "1", "Bulto 10"], ["Bodas de Coral", "Baúl batería", "Pedal tuner NUX", "1", "Bulto 10"], ["Bodas de Coral", "Monitoreo inalámbrico", "Transmisor Shure P9T PSM 900", "1", "Valija monitor inalámbrico"], ["Bodas de Coral", "Monitoreo inalámbrico", "Receptor Shure P9RA", "1", "Valija monitor inalámbrico"], ["Bodas de Coral", "Monitoreo inalámbrico", "Sennheiser XSW IEM SR", "1", "Caja monitor inalámbrico"], ["Bodas de Coral", "Monitoreo inalámbrico", "Sennheiser XSW IEM EK", "1", "Caja monitor inalámbrico"], ["Bodas de Coral", "Baúl cajonero", "Ventilador Antari FBN AF-3", "1", "Bulto 11"], ["Bodas de Coral", "Baúl cajonero", "Micrófono Sennheiser e835", "1", "Bulto 11"], ["Bodas de Coral", "Baúl cajonero", "Micrófono Beyerdynamic TG D52d", "1", "Bulto 11"], ["Bodas de Coral", "Baúl cajonero", "Micrófono Beyerdynamic TG D58c", "1", "Bulto 11"], ["Bodas de Coral", "Baúl cajonero", "Micrófono Shure Beta 58", "4", "Bulto 11"], ["Bodas de Coral", "Baúl cajonero", "Micrófono Shure SM58", "2", "Bulto 11"], ["Bodas de Coral", "Baúl cajonero", "Micrófono Shure SM57", "3", "Bulto 11"], ["Bodas de Coral", "Baúl cajonero", "Micrófono Samson C02", "5", "Bulto 11"], ["Bodas de Coral", "Baúl cajonero", "Micrófono Samson Q Kick", "1", "Bulto 11"], ["Bodas de Coral", "Baúl cajonero", "Micrófono Samson Q Tom", "1", "Bulto 11"], ["Bodas de Coral", "Baúl cajonero", "Direct box", "1", "Bulto 11"], ["Bodas de Coral", "Baúl cajonero", "Auriculares Audio-Technica / Sennheiser HD202", "1", "Bulto 11"], ["Bodas de Coral", "Baúl cajonero", "Multímetro tester M890G", "1", "Bulto 11"], ["Bodas de Coral", "Baúl cajonero", "Router TP-Link TL-WR941HP", "1", "Bulto 11"], ["Bodas de Coral", "Baúl cajonero", "Router TP-Link", "1", "Bulto 11"], ["Bodas de Coral", "Baúl cajonero", "Cables de conexión varios", "1", "Bulto 11"], ["Bodas de Coral", "Cables", "Mangueras y cables de conexión audio", "1", "Bulto 12 · baúl"], ["Bodas de Coral", "Cables", "Alargues, cables varios y zapatillas 220", "1", "Bulto 13 · baúl"], ["Bodas de Coral", "Cables", "Set de cables", "1", "Bulto 69 · baúl"], ["Bodas de Coral", "Guitarras y bajo", "Guitarra acústica Yamaha APX-9C", "1", "Bulto 14"], ["Bodas de Coral", "Guitarras y bajo", "Guitarra eléctrica Gibson 339", "1", "Bulto 15"], ["Bodas de Coral", "Guitarras y bajo", "Guitarra Yamaha APX-412A", "1", "Bulto 16"], ["Bodas de Coral", "Guitarras y bajo", "Guitarra Ovation 1617", "1", "Bulto 17"], ["Bodas de Coral", "Guitarras y bajo", "Guitarra 12 cuerdas Yamaha APX-4-12A", "1", "Bulto 18"], ["Bodas de Coral", "Guitarras y bajo", "Bajo Yamaha TRB 605", "1", "Bulto 23"], ["Bodas de Coral", "Baúl soportes guitarras / tablet / cortina", "Soporte Hercules GS412B Plus", "2", "Bulto 30"], ["Bodas de Coral", "Baúl soportes guitarras / tablet / cortina", "Soporte Hercules GS415B Plus", "3", "Bulto 30"], ["Bodas de Coral", "Baúl soportes guitarras / tablet / cortina", "Cortina de percusión con soporte", "1", "Bulto 30"], ["Bodas de Coral", "Baúl soportes guitarras / tablet / cortina", "Soporte para tablet", "1", "Bulto 30"], ["Bodas de Coral", "Teleprompter", "Monitor TV Admiral AD32E3A", "2", "Bulto 25 · baúl"], ["Bodas de Coral", "Teleprompter", "Notebook Samsung NP300E5C", "1", "Bulto 26 · valija"], ["Bodas de Coral", "Teleprompter", "Laptop Lenovo", "1", "Bulto 26 · valija"], ["Bodas de Coral", "Valija computadoras / iPads", "Laptop Lenovo V15 G5 IRL", "1", "Bulto 27"], ["Bodas de Coral", "Valija computadoras / iPads", "Mac mini M4", "1", "Bulto 27"], ["Bodas de Coral", "Valija computadoras / iPads", "iPad 2 16 GB", "1", "Bulto 27"], ["Bodas de Coral", "Valija computadoras / iPads", "iPad 2 32 GB", "2", "Bulto 27"], ["Bodas de Coral", "Valija computadoras / iPads", "Interfaz MIDISPORT 2x2 M-Audio", "1", "Bulto 27"], ["Bodas de Coral", "Valija computadoras / iPads", "Monitor 15\" + mouse + teclado", "1", "Bulto 27"], ["Bodas de Coral", "Valija repuestos computadoras", "MacBook Pro", "2", "Bulto 28"], ["Bodas de Coral", "Valija repuestos computadoras", "Switch TP-Link", "1", "Bulto 28"], ["Bodas de Coral", "Valija tablets", "Tablet Lenovo Tab M10 HD", "5", "Bulto 29"], ["Bodas de Coral", "Valija tablets", "Tablet Lenovo Tab P11 HD", "3", "Bulto 29"], ["Bodas de Coral", "Valija tablets", "Tablet Lenovo Tab P11", "1", "Bulto 29"], ["Bodas de Coral", "Pies de micrófono", "Pies de micrófono jirafa", "9", "Bulto 31 · baúl"], ["Bodas de Coral", "Pies de micrófono", "Pies de micrófono rectos", "5", "Bulto 32 · bolso"], ["Bodas de Coral", "Pies de micrófono", "Pies de micrófono jirafa", "4", "Bulto 32 · bolso"], ["Bodas de Coral", "Vientos", "Flauta traversa Yamaha 281", "1", "Bulto 33"], ["Bodas de Coral", "Vientos", "Saxo alto Yamaha YAS-25", "1", "Bulto 34"], ["Bodas de Coral", "Vientos", "Saxo tenor Yamaha YTS-25", "1", "Bulto 35"], ["Bodas de Coral", "Vientos", "Saxo barítono Yamaha YBS-32", "1", "Bulto 36"], ["Bodas de Coral", "Vientos", "Trompeta Conn Vintage One", "1", "Bulto 37"], ["Bodas de Coral", "Vientos", "Trombón King 606", "1", "Bulto 38"], ["Bodas de Coral", "Iluminación", "Scoop BV30A 150W", "6", "Bultos 39–44"], ["Bodas de Coral", "Iluminación", "Móvil AC 7R Beam", "10", "Bultos 45–54"], ["Bodas de Coral", "Iluminación", "Par LED PLS", "6", "Bultos 55–60"], ["Bodas de Coral", "Iluminación", "Leko", "1", "Bulto 61"], ["Bodas de Coral", "Iluminación", "Fresnel", "3", "Bultos 62, 63, 65"], ["Bodas de Coral", "Iluminación", "Splitter DMX", "1", "Bulto 64"], ["Bodas de Coral", "Iluminación", "Consola Avolites Titan Mobile", "1", "Bulto 66"], ["Bodas de Coral", "Iluminación", "Bola de espejo", "1", "Bulto 67"], ["Bodas de Coral", "Iluminación", "Soporte bola de espejo", "1", "Bulto 68"]];
+const DEMO_CATALOG = [["Teclados y pianos", "Teclado Yamaha CP88"], ["Teclados y pianos", "Teclado Yamaha Montage 8"], ["Teclados y pianos", "Banqueta de piano"], ["Estructuras símil piano", "Estructura símil piano desmontable"], ["Consola de sonido", "Consola Yamaha DM7C"], ["Baúl pachera digital", "Stage box Yamaha Rio 3224-D"], ["Baúl pachera digital", "Switch Cisco SG200-08"], ["Pedaleras", "Pedalera Roland PK-5"], ["Pedaleras", "Pedalera POD Line 6"], ["Pedaleras", "Pedal Boss Line Selector LS-2"], ["Pedaleras", "Cables plug-plug + interpedal"], ["Rack interfaces", "MOTU MIDI Timepiece"], ["Rack interfaces", "MOTU MIDI Micro Lite"], ["Rack interfaces", "MOTU MIDI Express"], ["Bolso redondo", "Banqueta regulable y cables de conexión"], ["Baúl soportes de batería", "Stand hi-hat HS7-40A"], ["Baúl soportes de batería", "Pedal de bombo Yamaha Iron Cobra"], ["Baúl soportes de batería", "Banqueta de batería Yamaha"], ["Baúl soportes de batería", "Snare stand Yamaha SS662"], ["Baúl soportes de batería", "Stand platos Yamaha CH755"], ["Baúl soportes de batería", "Pie octapad Yamaha"], ["Baúl soportes de batería", "Pie bombo legüero"], ["Baúl batería", "Armazón Hexrack2 RS10-HXR (3 partes)"], ["Baúl batería", "Módulo Yamaha DTX-PROX"], ["Baúl batería", "Tom 1 Yamaha XP105T-M"], ["Baúl batería", "Tom 2 Yamaha XP105T-M"], ["Baúl batería", "Tom 3 Yamaha XP125T-M"], ["Baúl batería", "Snare Yamaha XP125D-M"], ["Baúl batería", "Bombo Yamaha KP128"], ["Baúl batería", "Ride Yamaha PCY175"], ["Baúl batería", "Crash 1 Yamaha PCY135"], ["Baúl batería", "Crash 2 Yamaha PCY155"], ["Baúl batería", "Hi-hat Yamaha RHH135"], ["Baúl batería", "Octapad Yamaha DTX-Multi 12"], ["Baúl batería", "Pad Roland PD9"], ["Baúl batería", "Cables de conexión"], ["Baúl batería", "Caja directa múltiple"], ["Baúl batería", "Pedal POG Electro-Harmonix"], ["Baúl batería", "Pedal tuner NUX"], ["Monitoreo inalámbrico", "Transmisor Shure P9T PSM 900"], ["Monitoreo inalámbrico", "Receptor Shure P9RA"], ["Monitoreo inalámbrico", "Sennheiser XSW IEM SR"], ["Monitoreo inalámbrico", "Sennheiser XSW IEM EK"], ["Baúl cajonero", "Ventilador Antari FBN AF-3"], ["Baúl cajonero", "Micrófono Sennheiser e835"], ["Baúl cajonero", "Micrófono Beyerdynamic TG D52d"], ["Baúl cajonero", "Micrófono Beyerdynamic TG D58c"], ["Baúl cajonero", "Micrófono Shure Beta 58"], ["Baúl cajonero", "Micrófono Shure SM58"], ["Baúl cajonero", "Micrófono Shure SM57"], ["Baúl cajonero", "Micrófono Samson C02"], ["Baúl cajonero", "Micrófono Samson Q Kick"], ["Baúl cajonero", "Micrófono Samson Q Tom"], ["Baúl cajonero", "Direct box"], ["Baúl cajonero", "Auriculares Audio-Technica / Sennheiser HD202"], ["Baúl cajonero", "Multímetro tester M890G"], ["Baúl cajonero", "Router TP-Link TL-WR941HP"], ["Baúl cajonero", "Router TP-Link"], ["Baúl cajonero", "Cables de conexión varios"], ["Cables", "Mangueras y cables de conexión audio"], ["Cables", "Alargues, cables varios y zapatillas 220"], ["Cables", "Set de cables"], ["Guitarras y bajo", "Guitarra acústica Yamaha APX-9C"], ["Guitarras y bajo", "Guitarra eléctrica Gibson 339"], ["Guitarras y bajo", "Guitarra Yamaha APX-412A"], ["Guitarras y bajo", "Guitarra Ovation 1617"], ["Guitarras y bajo", "Guitarra 12 cuerdas Yamaha APX-4-12A"], ["Guitarras y bajo", "Bajo Yamaha TRB 605"], ["Baúl soportes guitarras / tablet / cortina", "Soporte Hercules GS412B Plus"], ["Baúl soportes guitarras / tablet / cortina", "Soporte Hercules GS415B Plus"], ["Baúl soportes guitarras / tablet / cortina", "Cortina de percusión con soporte"], ["Baúl soportes guitarras / tablet / cortina", "Soporte para tablet"], ["Teleprompter", "Monitor TV Admiral AD32E3A"], ["Teleprompter", "Notebook Samsung NP300E5C"], ["Teleprompter", "Laptop Lenovo"], ["Valija computadoras / iPads", "Laptop Lenovo V15 G5 IRL"], ["Valija computadoras / iPads", "Mac mini M4"], ["Valija computadoras / iPads", "iPad 2 16 GB"], ["Valija computadoras / iPads", "iPad 2 32 GB"], ["Valija computadoras / iPads", "Interfaz MIDISPORT 2x2 M-Audio"], ["Valija computadoras / iPads", "Monitor 15\" + mouse + teclado"], ["Valija repuestos computadoras", "MacBook Pro"], ["Valija repuestos computadoras", "Switch TP-Link"], ["Valija tablets", "Tablet Lenovo Tab M10 HD"], ["Valija tablets", "Tablet Lenovo Tab P11 HD"], ["Valija tablets", "Tablet Lenovo Tab P11"], ["Pies de micrófono", "Pies de micrófono jirafa"], ["Pies de micrófono", "Pies de micrófono rectos"], ["Vientos", "Flauta traversa Yamaha 281"], ["Vientos", "Saxo alto Yamaha YAS-25"], ["Vientos", "Saxo tenor Yamaha YTS-25"], ["Vientos", "Saxo barítono Yamaha YBS-32"], ["Vientos", "Trompeta Conn Vintage One"], ["Vientos", "Trombón King 606"], ["Iluminación", "Scoop BV30A 150W"], ["Iluminación", "Móvil AC 7R Beam"], ["Iluminación", "Par LED PLS"], ["Iluminación", "Leko"], ["Iluminación", "Fresnel"], ["Iluminación", "Splitter DMX"], ["Iluminación", "Consola Avolites Titan Mobile"], ["Iluminación", "Bola de espejo"], ["Iluminación", "Soporte bola de espejo"]];
+
+/* ================= Estado ================= */
+const LS = {
+  get:(k,d)=>{try{const v=localStorage.getItem(k);return v===null?d:JSON.parse(v)}catch(e){return d}},
+  set:(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+};
+const mem = {}; // respaldo si el navegador no deja usar localStorage
+const store = { get:(k,d)=>{const v=LS.get(k,undefined);return v===undefined?(k in mem?mem[k]:d):v}, set:(k,v)=>{mem[k]=v;LS.set(k,v)} };
+const cfg = () => ({ url: store.get("cp_api", SCRIPT_URL_DEFAULT), user: store.get("cp_user",""), pin: store.get("cp_pin","") });
+const isDemo = () => !cfg().url;
+
+let shows=[], checks={}, catalog=[], sheetUrl="", current=store.get("cp_current",null), pending=0, filter="", onlyMissing=false;
+
+const $ = s => document.querySelector(s);
+const slug = s => String(s).toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
+const esc = s => String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const now = () => new Date().toLocaleString("es-AR",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit",hour12:false}).replace(",","");
+const hhmm = () => now().split(" ").pop();
+
+/* ---------- Avisos y confirmación propios (sin alert/confirm del navegador) ---------- */
+let toastT;
+function toast(msg, err){ const t=$("#toast"); t.textContent=msg; t.className="toast show"+(err?" err":""); clearTimeout(toastT); toastT=setTimeout(()=>t.className="toast"+(err?" err":""),3200); }
+function ask(title, text, yes="Confirmar"){
+  return new Promise(res=>{
+    $("#cfTitle").textContent=title; $("#cfText").innerHTML=text; $("#cfYes").textContent=yes;
+    const d=$("#confirm"); const done=v=>{d.close();res(v)};
+    $("#cfYes").onclick=()=>done(true); $("#cfNo").onclick=()=>done(false); d.oncancel=()=>res(false);
+    d.showModal();
+  });
+}
+function setSync(msg, cls=""){ const s=$("#sync"); s.textContent=msg; s.className="sync "+cls; }
+
+/* ================= Datos ================= */
+function buildShows(rows){
+  rows = rows.filter(r=>r.some(x=>String(x).trim()!==""));
+  const head = rows.shift().map(slug);
+  const col = (...n)=>head.findIndex(h=>n.includes(h));
+  const iShow=col("show"), iSec=col("seccion","categoria","grupo"), iItem=col("item","items","equipo"),
+        iQty=col("cantidad","cant"), iNote=col("notas","nota","observaciones");
+  if(iShow<0||iSec<0||iItem<0) throw new Error("La pestaña Shows necesita las columnas Show, Sección e Ítem.");
+  const map=new Map(), used={};
+  let lastShow="", lastSec="";
+  rows.forEach(r=>{
+    const show=String(r[iShow]||"").trim()||lastShow, sec=String(r[iSec]||"").trim()||lastSec||"Varios", item=String(r[iItem]||"").trim();
+    lastShow=show; lastSec=sec;
+    if(!show||!item) return;
+    if(!map.has(show)) map.set(show,new Map());
+    const g=map.get(show); if(!g.has(sec)) g.set(sec,[]);
+    let id=[slug(show),slug(sec),slug(item)].join("|");
+    used[id]=(used[id]||0)+1; if(used[id]>1) id+="|"+used[id];
+    g.get(sec).push({id,name:item,sec,qty:iQty>=0?String(r[iQty]||"").trim():"",note:iNote>=0?String(r[iNote]||"").trim():""});
+  });
+  return [...map].map(([name,g])=>({name,groups:[...g].map(([gn,items])=>({name:gn,items}))}));
+}
+const rowsOf = (name, list) => [["Show","Sección","Ítem","Cantidad","Notas"], ...list.map(r=>[name,r.section,r.item,r.qty,r.notes])];
+
+async function api(action, payload){
+  const {url,user,pin} = cfg();
+  const res = await fetch(url,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({action,user,pin,...payload})});
+  const d = await res.json();
+  if(!d.ok) throw new Error(d.error||"Error del servidor");
+  return d;
+}
+
+async function load(silent){
+  $("#demoBanner").hidden = !isDemo();
+  try{
+    if(isDemo()){
+      if(!shows.length){ shows=store.get("cp_demo_shows",null)||buildShows(DEMO_ROWS.map(r=>r.slice())); checks=store.get("cp_demo_checks",{}); catalog=DEMO_CATALOG; }
+      setSync("");
+    } else {
+      if(!silent) setSync("Cargando…");
+      const res = await fetch(cfg().url+"?action=data&_="+Date.now());
+      const d = await res.json();
+      if(!d.ok) throw new Error(d.error||"No se pudo leer");
+      if(pending) return;
+      shows=buildShows(d.shows); checks=d.checks||{}; catalog=d.catalog||[]; sheetUrl=d.url||"";
+      setSync("✓ Sincronizado "+hhmm(),"ok");
+    }
+    $("#btnSheet").hidden = !sheetUrl; if(sheetUrl) $("#btnSheet").href=sheetUrl;
+    if(!shows.find(s=>s.name===current)) current=shows[0]?.name||null;
+    render();
+  }catch(e){ setSync("Sin conexión con el Sheet","err"); toast("No se pudo leer el Sheet: "+e.message,true); }
+}
+function saveDemo(){ store.set("cp_demo_checks",checks); store.set("cp_demo_shows",shows); }
+
+/* ================= Render ================= */
+const stats = items => ({d:items.filter(i=>checks[i.id]).length, t:items.length});
+const getShow = name => shows.find(s=>s.name===name);
+const showItems = name => (getShow(name)?.groups||[]).flatMap(g=>g.items);
+
+function render(){
+  $("#tabs").innerHTML = shows.map(s=>{
+    const {d,t}=stats(s.groups.flatMap(g=>g.items));
+    return `<button class="tab ${s.name===current?"active":""}" data-show="${esc(s.name)}">${esc(s.name)}<small>${d}/${t}</small></button>`;
+  }).join("");
+
+  const show=getShow(current);
+  if(!show){ $("#main").innerHTML=`<div class="empty">Todavía no hay shows. Tocá <b>＋ Nuevo show</b>.</div>`; return; }
+  const {d,t}=stats(show.groups.flatMap(g=>g.items)), pct=t?Math.round(d*100/t):0;
+  const q=slug(filter);
+
+  $("#main").innerHTML = `
+    <div class="showhead">
+      <h1>${esc(show.name)}</h1><div class="spacer"></div><span class="pct">${pct}%</span>
+    </div>
+    <div class="bar ${d===t&&t?"done":""}"><div style="width:${pct}%"></div></div>
+    <div class="count">${d} de ${t} ítems chequeados · ${show.groups.length} secciones</div>
+    <div class="tools">
+      <input id="search" placeholder="Buscar ítem…" value="${esc(filter)}">
+      <label><input type="checkbox" id="onlyMissing" ${onlyMissing?"checked":""} style="width:18px;height:18px"> Solo faltantes</label>
+      <button id="btnEdit">Editar show</button>
+      <button id="btnPrint" class="ghost">Imprimir</button>
+      <button class="danger" id="btnReset">↺ Reiniciar checklist</button>
+    </div>
+    <div class="grid">
+      ${show.groups.map((g,gi)=>{
+        const s=stats(g.items);
+        const vis=g.items.filter(i=>(!q||slug(i.name+" "+i.note).includes(q))&&(!onlyMissing||!checks[i.id]));
+        if((q||onlyMissing)&&!vis.length) return "";
+        return `
+        <section class="group ${s.d===s.t?"complete":""}">
+          <div class="ghead"><h2>${esc(g.name)}</h2><span class="count">${s.d}/${s.t}</span>
+            <button data-all="${gi}">${s.d===s.t?"Desmarcar":"Todo"}</button></div>
+          <ul>${vis.map(i=>{const c=checks[i.id];return `
+            <li class="${c?"checked":""} ${c&&c.p?"pending":""}"><label>
+              <input type="checkbox" data-id="${esc(i.id)}" ${c?"checked":""}>
+              <span class="item">
+                <span class="name">${i.qty&&i.qty!=="1"?`<span class="qty">${esc(i.qty)}×</span>`:""}${esc(i.name)}</span>
+                ${i.note?`<span class="note">${esc(i.note)}</span>`:""}
+                ${c&&c.u?`<span class="who">✓ ${esc(c.u)} · ${esc(c.t||"")}</span>`:""}
+              </span>
+            </label></li>`}).join("")}</ul>
+        </section>`}).join("")}
+    </div>`;
+  const si=$("#search"); si.oninput=()=>{filter=si.value;render();const n=$("#search");n.focus();n.setSelectionRange(n.value.length,n.value.length)};
+  $("#onlyMissing").onchange=e=>{onlyMissing=e.target.checked;render()};
+}
+
+/* ================= Tildes ================= */
+async function setChecks(items, value){
+  if(!isDemo() && !cfg().user){ toast("Primero poné tu nombre en Configuración",true); openCfg(); render(); return; }
+  const before={}; items.forEach(i=>before[i.id]=checks[i.id]);
+  items.forEach(i=>{ if(value) checks[i.id]={u:cfg().user||"Yo",t:now(),p:!isDemo()}; else delete checks[i.id]; });
+  render();
+  if(isDemo()){ saveDemo(); return; }
+  pending++; setSync("Guardando…");
+  try{
+    await api("check",{value, items:items.map(i=>({id:i.id, show:current, section:i.sec, item:i.name}))});
+    items.forEach(i=>{ if(checks[i.id]) delete checks[i.id].p; });
+    setSync("✓ Guardado "+hhmm(),"ok");
+  }catch(e){
+    items.forEach(i=>{ if(before[i.id]) checks[i.id]=before[i.id]; else delete checks[i.id]; });
+    setSync("Error al guardar","err"); toast("No se guardó: "+e.message,true);
+  }finally{ pending--; render(); }
+}
+
+async function resetShow(btn){
+  const items=showItems(current), marked=items.filter(i=>checks[i.id]).length;
+  if(!marked){ toast("La checklist ya está en cero"); return; }
+  const ok=await ask("Reiniciar checklist",`Se van a desmarcar los <b>${marked}</b> ítems tildados de <b>${esc(current)}</b> para dejarlo listo para el próximo show.`+(isDemo()?"":"<br><br>Lo tildado queda guardado en la pestaña <b>Historial</b> del Sheet."),"Reiniciar");
+  if(!ok) return;
+  if(isDemo()){ items.forEach(i=>delete checks[i.id]); saveDemo(); render(); toast("Checklist reiniciada"); return; }
+  btn.disabled=true; pending++; setSync("Reiniciando…");
+  try{
+    await api("reset",{show:current});
+    items.forEach(i=>delete checks[i.id]);
+    toast("Checklist reiniciada · lista para el próximo show");
+  }catch(e){ toast("No se pudo reiniciar: "+e.message,true); }
+  finally{ pending--; render(); load(true); }
+}
+
+document.addEventListener("change",e=>{
+  if(!e.target.matches("input[data-id]")) return;
+  const item=showItems(current).find(i=>i.id===e.target.dataset.id);
+  if(item) setChecks([item], e.target.checked);
+});
+document.addEventListener("click",e=>{
+  const tab=e.target.closest("[data-show]");
+  if(tab){ current=tab.dataset.show; store.set("cp_current",current); filter=""; render(); return; }
+  const all=e.target.closest("[data-all]");
+  if(all){ const g=getShow(current).groups[all.dataset.all], s=stats(g.items); setChecks(g.items, s.d!==s.t); return; }
+  const b=e.target.closest("button"); if(!b) return;
+  if(b.id==="btnReset") resetShow(b);
+  if(b.id==="btnEdit") openShowForm(current);
+  if(b.id==="btnPrint") try{ window.print(); }catch(_){ toast("Abrí la página en el navegador para imprimir",true); }
+});
+
+/* ================= Nuevo / editar show ================= */
+let editing=null;
+const catSecs = () => [...new Set([...catalog.map(c=>c[0]), ...shows.flatMap(s=>s.groups.map(g=>g.name))])];
+function nsRow(r={}, before){
+  const tr=document.createElement("tr");
+  tr.innerHTML=`<td><input list="secList" class="ns-sec" value="${esc(r.sec||"")}" placeholder="Sección"></td>
+    <td><input list="itemList" class="ns-item" value="${esc(r.name||"")}" placeholder="Ítem"></td>
+    <td><input class="ns-qty" value="${esc(r.qty||"1")}"></td>
+    <td><input class="ns-note" value="${esc(r.note||"")}"></td>
+    <td><button type="button" title="Quitar">✕</button></td>`;
+  tr.querySelector("button").onclick=()=>tr.remove();
+  const itemIn=tr.querySelector(".ns-item");
+  itemIn.onfocus=()=>{ const sec=tr.querySelector(".ns-sec").value.trim();
+    const opts=catalog.filter(c=>!sec||c[0]===sec).map(c=>c[1]);
+    $("#itemList").innerHTML=[...new Set(opts)].map(o=>`<option value="${esc(o)}">`).join(""); };
+  itemIn.onchange=()=>{ const secIn=tr.querySelector(".ns-sec"); if(!secIn.value.trim()){ const m=catalog.find(c=>c[1]===itemIn.value.trim()); if(m) secIn.value=m[0]; } };
+  before ? $("#nsRows").insertBefore(tr,before) : $("#nsRows").appendChild(tr);
+  return tr;
+}
+function fillRows(name){ $("#nsRows").innerHTML=""; const src=showItems(name); if(src.length) src.forEach(r=>nsRow(r)); else for(let i=0;i<4;i++) nsRow(); }
+function openShowForm(editName){
+  editing=editName||null;
+  $("#nsTitle").textContent=editing?"Editar show":"Nuevo show";
+  $("#nsName").value=editing||""; $("#nsName").disabled=!!editing;
+  $("#nsCopyWrap").hidden=!!editing;
+  $("#nsCopy").innerHTML=`<option value="">— Empezar vacío —</option>`+shows.map(s=>`<option>${esc(s.name)}</option>`).join("");
+  $("#secList").innerHTML=catSecs().map(s=>`<option value="${esc(s)}">`).join("");
+  fillRows(editing);
+  $("#ns").showModal(); if(!editing) $("#nsName").focus();
+}
+$("#nsCopy").onchange=()=>fillRows($("#nsCopy").value);
+$("#nsAdd").onclick=()=>{ const last=[...$("#nsRows").querySelectorAll(".ns-sec")].pop(); nsRow({sec:last?last.value:""}).querySelector(".ns-item").focus(); $(".nswrap").scrollTop=1e6; };
+$("#nsAddSec").onclick=async()=>{
+  const secs=[...new Set(catalog.map(c=>c[0]))];
+  if(!secs.length) return toast("El catálogo está vacío",true);
+  $("#cfTitle").textContent="Agregar sección del catálogo";
+  $("#cfText").innerHTML=`<select id="secPick">${secs.map(s=>`<option>${esc(s)}</option>`).join("")}</select>`;
+  $("#cfYes").textContent="Agregar";
+  const d=$("#confirm");
+  $("#cfYes").onclick=()=>{ const s=$("#secPick").value; catalog.filter(c=>c[0]===s).forEach(c=>nsRow({sec:s,name:c[1]})); d.close(); $(".nswrap").scrollTop=1e6; };
+  $("#cfNo").onclick=()=>d.close();
+  d.showModal();
+};
+$("#nsCancel").onclick=()=>$("#ns").close();
+$("#nsSave").onclick=async()=>{
+  const name=$("#nsName").value.trim();
+  if(!name) return toast("Poné el nombre del show",true);
+  if(!editing && shows.some(s=>s.name.toLowerCase()===name.toLowerCase())) return toast("Ya existe un show con ese nombre",true);
+  const rows=[...$("#nsRows").children].map(tr=>({
+    section:tr.querySelector(".ns-sec").value.trim()||"Varios", item:tr.querySelector(".ns-item").value.trim(),
+    qty:tr.querySelector(".ns-qty").value.trim(), notes:tr.querySelector(".ns-note").value.trim()})).filter(r=>r.item);
+  if(!rows.length) return toast("Agregá al menos un ítem",true);
+  if(isDemo()){
+    const built=buildShows(rowsOf(name,rows))[0];
+    if(editing) shows=shows.map(s=>s.name===editing?built:s); else shows.push(built);
+    current=name; saveDemo(); $("#ns").close(); render(); toast(editing?"Show actualizado":"Show creado"); return;
+  }
+  const b=$("#nsSave"); b.disabled=true; b.textContent="Guardando…";
+  try{
+    await api(editing?"editShow":"newShow",{show:name, rows});
+    current=name; store.set("cp_current",current); $("#ns").close();
+    toast(editing?"Show actualizado":"Show creado"); await load(true);
+  }catch(e){ toast("No se pudo guardar: "+e.message,true); }
+  finally{ b.disabled=false; b.textContent="Guardar show"; }
+};
+
+/* ================= Config ================= */
+function openCfg(){ const c=cfg(); $("#cfgUser").value=c.user; $("#cfgUrl").value=c.url; $("#cfgPin").value=c.pin; $("#cfg").showModal(); }
+$("#btnConfig").onclick=openCfg;
+$("#cfgCancel").onclick=()=>$("#cfg").close();
+$("#cfgSave").onclick=()=>{
+  const wasDemo=isDemo();
+  store.set("cp_user",$("#cfgUser").value.trim()); store.set("cp_api",$("#cfgUrl").value.trim()); store.set("cp_pin",$("#cfgPin").value.trim());
+  $("#cfg").close(); if(wasDemo!==isDemo()){ shows=[]; checks={}; } load();
+};
+$("#btnNew").onclick=()=>openShowForm(null);
+$("#btnReload").onclick=()=>load();
+
+setInterval(()=>{ if(!isDemo() && !pending && !document.querySelector("dialog[open]") && !document.hidden && document.activeElement?.id!=="search") load(true); }, 20000);
+document.addEventListener("visibilitychange",()=>{ if(!document.hidden && !isDemo()) load(true); });
+
+load();
+if(!isDemo() && !cfg().user) openCfg();
+</script>
+</body>
+</html>
